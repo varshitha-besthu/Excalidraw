@@ -11,7 +11,7 @@ interface User {
 }
 
 const users: User[] = [];
-const rooms = [];
+
 function checkUser(token: string): string | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);

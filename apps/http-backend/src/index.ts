@@ -2,12 +2,14 @@
 const {JWT_SECRET} = require("@repo/be-common/src/index");
 import express from "express";
 const app=express();
+import cors from "cors";
 import jwt from "jsonwebtoken";
 import { middleware } from "./middleware";
 const {CreateUserSchema, SigninSchema, RoomSchema} = require("@repo/common/index");
 const { prismaClient } = require("@repo/db/client");
 
 app.use(express.json());
+app.use(cors());
 app.post("/signup", async(req, res)=>{
     const parsedData = CreateUserSchema.safeParse(req.body);
     if (!parsedData.success) {
@@ -101,20 +103,43 @@ app.post("/room", middleware, async (req, res) => {
 })
 
 app.get("/chats/:roomId", async(req, res) => {
-    const roomId = Number(req.params.roomId);
-    const messages = await prismaClient.chat.findMany({
-        where:{
-            roomId: roomId
-        },
-        orderBy: {
-            id:"desc"
-        },
-        take: 50
-    })
+    try{
+        const roomId = Number(req.params.roomId);
+        const messages = await prismaClient.chat.findMany({
+            where:{
+                roomId: roomId
+            },
+            orderBy: {
+                id:"asc"
+            },
+            take: 50
+        })
 
-    res.json({
-        messages
-    })
+        res.json({
+            messages: messages
+        })
+    }catch(e){
+        res.json({messages: []})
+    }
+    
 })
+
+app.get("/room/:slug", async(req, res) => {
+    try{
+        const slug = req.params.slug;
+        const room = await prismaClient.room.findUnique({
+            where:{
+                slug: slug
+            }
+        })
+
+        res.json({
+            room
+        })
+    }catch(e){
+        res.json(e);
+    }  
+})
+
 
 app.listen(3001)
