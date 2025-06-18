@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import jwt from "jsonwebtoken";
 const { prismaClient } = require("@repo/db/client");
 const { JWT_SECRET } = require("@repo/be-common/src/index");
-const wss = new WebSocketServer({ port: 8081 });
+const wss = new WebSocketServer({ port: 8080 });
 
 interface User {
   ws: WebSocket;
@@ -72,6 +72,13 @@ wss.on("connection", function connection(ws, request) {
 
     console.log("message received");
     console.log(parsedData);
+    if(parsedData.type === "delete"){
+      //@ts-ignore
+      const roomId = parsedData.roomId;
+      const delItems = JSON.parse(parsedData.message);
+     
+      
+    }
 
     if (parsedData.type === "chat") {
       const roomId = parsedData.roomId;

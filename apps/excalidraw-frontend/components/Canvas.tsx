@@ -1,11 +1,10 @@
 "use client"
 
-import { initDraw } from "@/draw";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./iconButton";
-import { Circle, LineChart, Pencil, RectangleHorizontalIcon } from "lucide-react";
+import { ArrowUpIcon, Circle, Eraser, LineChart, Pencil, RectangleHorizontalIcon } from "lucide-react";
 import { Game } from "@/draw/Game";
-export type Tool = "circle" | "rect" | "pencil";
+export type Tool = "circle" | "rect" | "pencil" | "arrow" | "eraser";
 export default function Canvas({ roomId, socket }: { roomId: string, socket: WebSocket }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [selectedTool, setSelectedTool] = useState<Tool>("circle");
@@ -47,6 +46,8 @@ function Topbar({ selectedTool, setSelectedTool }: {
                 <IconButton activated={selectedTool == "pencil"} icon={<Pencil />} onClick={() => { setSelectedTool("pencil") }} />
                 <IconButton activated={selectedTool == "rect"} icon={<RectangleHorizontalIcon />} onClick={() => { setSelectedTool("rect") }} />
                 <IconButton activated={selectedTool == "circle"} icon={<Circle />} onClick={() => { setSelectedTool("circle") }} />
+                <IconButton activated={selectedTool == "arrow"} icon={<ArrowUpIcon />} onClick={() => setSelectedTool("arrow")} />
+                <IconButton activated={selectedTool == "eraser"} icon={<Eraser />} onClick={() => setSelectedTool("eraser")} />
             </div>
 
 

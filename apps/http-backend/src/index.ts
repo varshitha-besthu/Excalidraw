@@ -43,7 +43,8 @@ app.post("/signin", async(req, res)=>{
      const parsedData = SigninSchema.safeParse(req.body);
     if (!parsedData.success) {
         res.json({
-            message: "Incorrect inputs"
+            message: "Incorrect inputs",
+            
         })
         return;
     }
@@ -142,4 +143,4 @@ app.get("/room/:slug", async(req, res) => {
 })
 
 
-app.listen(3002)
+app.listen(3001)
