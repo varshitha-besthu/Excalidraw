@@ -75,8 +75,12 @@ wss.on("connection", function connection(ws, request) {
     if(parsedData.type === "delete"){
       //@ts-ignore
       const roomId = parsedData.roomId;
-      const delItems = JSON.parse(parsedData.message);
-     
+      const delItem = JSON.parse(parsedData.message);
+      await prismaClient.chat.delete({
+        where: {
+          id: delItem
+        }
+      })
       
     }
 

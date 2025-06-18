@@ -4,26 +4,31 @@ import { Tool } from "@/components/Canvas";
 import { EventHandler } from "react";
 
 type Shape = {
-    type: "rect";
-    x: number;
-    y: number;
-    width: number;
+    id ?: number,
+    type : "rect";
+    x : number;
+    y : number;
+    width : number;
     height: number;
 } | {
+    id ?:number,
     type: "circle";
     centerX: number;
     centerY: number;
     radius: number;
 } | {
+    id ?:number,
     type: "pencil";
     pencilPath: {x: number, y: number, drag: boolean}[];
 } | {
+    id ?:number,
     type: "arrow";
     startX : number,
     startY : number,
     endX : number,
     endY : number
 } | {
+    id ?:number,
     type : "eraser"
 }
 
@@ -40,7 +45,6 @@ export class Game{
     private endY = 0;
     private pencilPath : {x:number, y: number, drag: boolean}[] = []
     
-    private deletedShapes : Shape[]  = []
     private selectedTool:Tool = "circle"
     constructor(canvas: HTMLCanvasElement, roomId: string, socket:WebSocket){
         this.canvas = canvas;
@@ -265,7 +269,8 @@ export class Game{
                             if(!(inX && inY)){
                                 return true;
                             }
-                            this.deletedShapes.push(shape); 
+                            //@ts-ignore
+                            this.deleteShape(shape.id);
                             return false;
                         }
 
@@ -275,7 +280,8 @@ export class Game{
                             if((dx * dx + dy * dy > shape.radius * shape.radius)){
                                 return true
                             }
-                            this.deletedShapes.push(shape);
+                            //@ts-ignore
+                            this.deleteShape(shape.id);
                             return false
                         }
 
@@ -287,7 +293,9 @@ export class Game{
                                 return dx * dx + dy * dy <= eraserRadius * eraserRadius;
                             });
                             if(isNearAnyPoint){
-                                this.deletedShapes.push(shape);
+
+                                //@ts-ignore
+                                this.deleteShape(shape.id);
                                 return false;
                             }
                             return true;
@@ -304,7 +312,8 @@ export class Game{
                                 return true;
                             }
                             console.log(shape);
-                            
+                            //@ts-ignore
+                            this.deleteShape(shape.id);
                             return false;
                         }
 
@@ -315,6 +324,18 @@ export class Game{
                 }
 
             }
+    }
+    deleteShape(id: number | null){
+        if(id == null){
+            return
+        }
+        this.socket.send(JSON.stringify({
+                type: "delete",
+                message: JSON.stringify({
+                    id
+                }),
+                roomId: this.roomId,
+        }))
     }
     initMouseHandlers(){
         this.canvas.addEventListener("mousedown", this.MouseDownHandler)
