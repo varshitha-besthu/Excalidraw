@@ -1,8 +1,8 @@
-import { Ribbon } from "lucide-react";
+
+import { timeStamp } from "console";
 import { getExistingShapes } from "./http";
 import { Tool } from "@/components/Canvas";
-import { EventHandler } from "react";
-
+import { parse } from "path";
 type Shape = {
     id ?: number,
     type : "rect";
@@ -59,8 +59,15 @@ export class Game{
     }
     async init(){
         this.existingShapes = await getExistingShapes(this.roomId);
+        console.log(this.existingShapes);
+        if(!this.ctx){
+            return;
+        }
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+
         this.clearCanvas();
     }
+    
     setTool(tool : "circle" | "pencil" | "rect" | "arrow" | "eraser"){
         this.selectedTool = tool;
     }
@@ -71,8 +78,18 @@ export class Game{
             if (message.type == "chat") {
                 const parsedShape = JSON.parse(message.message)
                 this.existingShapes.push(parsedShape.shape)
-                this.clearCanvas();
             }
+            if (message.type === "updatedShapes") {
+                // console.log("updated shapes" , this.existingShapes);
+                console.log("updated Shape", message.updatedShapes);
+                this.existingShapes = []
+                for(let i = 0; i < message.updatedShapes.length; i++){
+                    // console.log(JSON.parse(message.updatedShapes[i].message).shape)
+                    this.existingShapes.push(JSON.parse(message.updatedShapes[i].message).shape)
+                }
+                // this.existingShapes = message.updatedShapes.shape;
+            }
+            this.clearCanvas();
         }
     }
     destroy(){
@@ -81,23 +98,35 @@ export class Game{
         this.canvas.removeEventListener("mousemove", this.MouseMoveHandler)
     }
     clearCanvas(){
+        if(!this.ctx){
+            return;
+        }
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "rgba(0, 0, 0)"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.existingShapes.map((shape) => {
+        this.ctx.strokeStyle = "rgba(255, 255, 255)"
+        this.existingShapes.map((s) => {
+            //@ts-ignore
+            let shape;
+            //@ts-ignore
+            if(!s.shape){
+                shape = s
+            }else{
+                //@ts-ignore
+                shape = s.shape
+            }
             if (shape.type === "rect") {
-                this.ctx.strokeStyle = "rgba(255, 255, 255)"
                 this.ctx.beginPath()
                 this.ctx.roundRect(shape.x, shape.y, shape.width, shape.height, [5]);
                 this.ctx.stroke()
+                this.ctx.closePath()
             } else if(shape.type === "circle") {
                 this.ctx.beginPath();
                 this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
                 this.ctx.stroke();
                 this.ctx.closePath();                
             }else if (shape.type === "pencil") {
-                console.log(this.pencilPath);
                 this.ctx.lineJoin = "round";
                 this.ctx.lineCap = "round";
                 this.ctx.beginPath();
@@ -131,8 +160,8 @@ export class Game{
     }
     MouseDownHandler = (e: MouseEvent) => {
         this.clicked = true
-        this.startX = e.clientX
-        this.startY = e.clientY 
+        this.startX = e.offsetX
+        this.startY = e.offsetY 
         if(this.selectedTool === "pencil"){
             this.pencilPath = [{x: e.offsetX,y: e.offsetY, drag:false}];
             this.ctx.lineJoin = "round"
@@ -146,11 +175,8 @@ export class Game{
          this.clicked = false
             const width = e.clientX - this.startX;
             const height = e.clientY - this.startY;
-
-            
             let shape: Shape | null = null;
             if (this.selectedTool === "rect") {
-                console.log("rectanle")
                 shape = {
                     type: "rect",
                     x: this.startX,
@@ -159,7 +185,6 @@ export class Game{
                     width
                 }
             } else if (this.selectedTool === "circle") {
-                console.log("circle")
                 const radius = Math.max(width, height) / 2;
                 shape = {
                     type: "circle",
@@ -168,7 +193,6 @@ export class Game{
                     centerY: this.startY + radius,
                 }
             }else if(this.selectedTool === "pencil"){
-                console.log("pencil")
                 shape = {
                     type:"pencil",
                     pencilPath: this.pencilPath
@@ -177,7 +201,6 @@ export class Game{
                 this.pencilPath = [];
 
             }else if(this.selectedTool === "arrow"){
-                console.log("Arrow");
                 shape = {
                     type : "arrow",
                     startX : this.startX,
@@ -186,22 +209,23 @@ export class Game{
                     endY : this.endY
                 }
             }else if(this.selectedTool === "eraser"){
-                
+                alert("fuck off")
             }
 
             if (!shape) {
+                console.log("shape is empty")
                 return;
             }
 
             this.existingShapes.push(shape);
-
             this.socket.send(JSON.stringify({
                 type: "chat",
                 message: JSON.stringify({
-                    shape
+                    shape: shape
                 }),
                 roomId: this.roomId,
             }))
+            console.log(this.existingShapes)
     }
     MouseMoveHandler = (e: MouseEvent) => {
          if (this.clicked) {
@@ -217,6 +241,7 @@ export class Game{
                     this.ctx.beginPath()
                     this.ctx.roundRect(this.startX, this.startY, width, height, [5]);  
                     this.ctx.stroke() 
+                    this.ctx.closePath()
                 } else if (this.selectedTool === "circle") {
                     const radius = Math.max(width, height) / 2;
                     const centerX = this.startX + radius;
@@ -257,7 +282,19 @@ export class Game{
                 }else if(this.selectedTool === "eraser"){
                     let x = e.clientX;
                     let y = e.clientY;
-                    this.existingShapes = this.existingShapes.filter((shape) => {
+                    this.existingShapes = this.existingShapes.filter((s) => {
+                        //@ts-ignore
+                        let shape;
+                        //@ts-ignore
+                        if(!s.shape){
+                            shape = s
+                            // alert("here s is shape")
+                        }else{
+                            //@ts-ignore
+                            // alert("here s is not shape")
+                            shape = s.shape
+                        }
+
                         if (shape.type === "rect") {
                              const left = Math.min(shape.x, shape.x + shape.width);
                             const right = Math.max(shape.x, shape.x + shape.width);
@@ -270,7 +307,7 @@ export class Game{
                                 return true;
                             }
                             //@ts-ignore
-                            this.deleteShape(shape.id);
+                            this.deleteShape(s.id);
                             return false;
                         }
 
@@ -281,12 +318,14 @@ export class Game{
                                 return true
                             }
                             //@ts-ignore
-                            this.deleteShape(shape.id);
+                            this.deleteShape(s.id);
+                            alert("deleting the circle ")
                             return false
                         }
 
                         else if (shape.type === "pencil") {
                             const eraserRadius = 5;
+                            //@ts-ignore
                             const isNearAnyPoint = shape.pencilPath.some((point) => {
                                 const dx = x - point.x;
                                 const dy = y - point.y;
@@ -295,7 +334,7 @@ export class Game{
                             if(isNearAnyPoint){
 
                                 //@ts-ignore
-                                this.deleteShape(shape.id);
+                                this.deleteShape(s.id);
                                 return false;
                             }
                             return true;
@@ -311,9 +350,8 @@ export class Game{
                             if(!isInside){
                                 return true;
                             }
-                            console.log(shape);
                             //@ts-ignore
-                            this.deleteShape(shape.id);
+                            this.deleteShape(s.id);
                             return false;
                         }
 
@@ -332,10 +370,13 @@ export class Game{
         this.socket.send(JSON.stringify({
                 type: "delete",
                 message: JSON.stringify({
-                    id
+                    id: id
                 }),
                 roomId: this.roomId,
         }))
+
+        
+        
     }
     initMouseHandlers(){
         this.canvas.addEventListener("mousedown", this.MouseDownHandler)

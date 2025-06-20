@@ -49,8 +49,6 @@ function Topbar({ selectedTool, setSelectedTool }: {
                 <IconButton activated={selectedTool == "arrow"} icon={<ArrowUpIcon />} onClick={() => setSelectedTool("arrow")} />
                 <IconButton activated={selectedTool == "eraser"} icon={<Eraser />} onClick={() => setSelectedTool("eraser")} />
             </div>
-
-
         </div>
     )
 }

@@ -71,27 +71,18 @@ wss.on("connection", function connection(ws, request) {
     }
 
     console.log("message received");
-    console.log(parsedData);
-    if(parsedData.type === "delete"){
-      //@ts-ignore
-      const roomId = parsedData.roomId;
-      const delItem = JSON.parse(parsedData.message);
-      await prismaClient.chat.delete({
-        where: {
-          id: delItem
-        }
-      })
-      
-    }
-
+   
+    
     if (parsedData.type === "chat") {
       const roomId = parsedData.roomId;
+      
       const message = parsedData.message;
-
+      
+     
       await prismaClient.chat.create({
         data: {
           roomId: Number(roomId),
-          message,
+          message : message,
           userId,
         },
       });
@@ -108,5 +99,39 @@ wss.on("connection", function connection(ws, request) {
         }
       });
     }
+    if(parsedData.type === "delete"){
+      //@ts-ignore
+      const roomId = parsedData.roomId;
+      try {
+        const delItem = JSON.parse(parsedData.message);
+        console.log("Trying to delete:", delItem);
+        await prismaClient.chat.delete({
+          where: {
+            id: Number(delItem.id)
+          }
+        });
+        let updatedShapes = await prismaClient.chat.findMany()
+        console.log("updated Shapes from the ws-backend",updatedShapes)
+        
+
+        users.forEach((user) => {
+          if (user.rooms.includes(roomId)) {
+            user.ws.send(
+              JSON.stringify({
+                type: "updatedShapes",
+                updatedShapes: updatedShapes,
+                roomId: roomId,
+              })
+            );
+          }
+        });
+
+      
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+            
+    }
+
   });
 });

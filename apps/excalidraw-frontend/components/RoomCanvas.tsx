@@ -1,9 +1,7 @@
 "use client"
 import { token, WS_URl } from "@/config";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Canvas from "./Canvas";
-import { json } from "stream/consumers";
-
 export default function RoomCanvas({roomId} : {roomId: string}){
 
     const [socket, setSocket] = useState<WebSocket | null>();
