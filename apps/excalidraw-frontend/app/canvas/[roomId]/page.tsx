@@ -1,9 +1,6 @@
 
 
 import RoomCanvas from "@/components/RoomCanvas";
-import { initDraw } from "@/draw";
-import { useEffect, useRef } from "react"
-import { start } from "repl";
 
 
 export default async function CanvasPage({params}: {

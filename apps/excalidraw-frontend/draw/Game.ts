@@ -209,7 +209,7 @@ export class Game{
                     endY : this.endY
                 }
             }else if(this.selectedTool === "eraser"){
-                alert("fuck off")
+                // alert("fuck off")
             }
 
             if (!shape) {
@@ -319,7 +319,7 @@ export class Game{
                             }
                             //@ts-ignore
                             this.deleteShape(s.id);
-                            alert("deleting the circle ")
+                            // alert("deleting the circle ")/
                             return false
                         }
 

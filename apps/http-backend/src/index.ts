@@ -24,7 +24,6 @@ app.post("/signup", async(req, res)=>{
         const user = await prismaClient.user.create({
             data: {
                 email: parsedData.data?.username,
-                // TODO: Hash the pw
                 password: parsedData.data.password,
                 name: parsedData.data.name
             }
@@ -44,12 +43,9 @@ app.post("/signin", async(req, res)=>{
     if (!parsedData.success) {
         res.json({
             message: "Incorrect inputs",
-            
         })
         return;
     }
-
-    // TODO: Compare the hashed pws here
     const user = await prismaClient.user.findFirst({
         where: {
             email: parsedData.data.username,
@@ -76,6 +72,7 @@ app.post("/signin", async(req, res)=>{
 
 app.post("/room", middleware, async (req, res) => {
     const parsedData = RoomSchema.safeParse(req.body);
+    console.log(req.body);
     if (!parsedData.success) {
         res.json({
             message: "Incorrect inputs"
