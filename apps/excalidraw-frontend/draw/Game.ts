@@ -1,6 +1,6 @@
 
 import { getExistingShapes } from "./http";
-import { Tool } from "@/components/Canvas";
+import { Tool, Color } from "@/components/Canvas";
 import { parse } from "path";
 type Shape = {
     id ?: number,
@@ -55,6 +55,7 @@ export class Game{
     private pencilPath : {x:number, y: number, drag: boolean}[] = []
     
     private selectedTool:Tool = "circle"
+    private selectedColor:Color = "white"
     constructor(canvas: HTMLCanvasElement, roomId: string, socket:WebSocket){
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
@@ -134,6 +135,7 @@ export class Game{
                 //@ts-ignore
                 shape = s.shape
             }
+            this.ctx.strokeStyle = "rgba(255, 255, 255)";
             if (shape.type === "rect") {
                 this.ctx.beginPath()
                 this.ctx.roundRect(shape.x, shape.y, shape.width, shape.height, [5]);
