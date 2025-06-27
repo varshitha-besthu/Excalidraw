@@ -34,6 +34,7 @@ export default function CreateRoom(){
         let roomId;
         console.log("the slug is",slug)
         if(isJoin === "join"){
+            console.log("slug izz", slug);
             res = await axios.get(`${HTTP_BACKEND}/room/${slug}`)
             roomId = res.data.room.id;
             

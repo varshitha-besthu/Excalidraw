@@ -77,10 +77,13 @@ wss.on("connection", function connection(ws, request) {
       const roomId = parsedData.roomId;
       
       const message = parsedData.message;
-      
+      const shape = JSON.parse(message).shape.id;
+      console.log(shape);
+      // console.log(shape.id);
      
       await prismaClient.chat.create({
         data: {
+          id:shape,
           roomId: Number(roomId),
           message : message,
           userId,
@@ -103,14 +106,21 @@ wss.on("connection", function connection(ws, request) {
       //@ts-ignore
       const roomId = parsedData.roomId;
       try {
-        const delItem = JSON.parse(parsedData.message);
+        const delItem = JSON.parse(parsedData.message).deletedShapes;
         console.log("Trying to delete:", delItem);
-        await prismaClient.chat.delete({
+        await prismaClient.chat.deleteMany({
           where: {
-            id: Number(delItem.id)
+            id: {
+              in: delItem
+            }
           }
         });
-        let updatedShapes = await prismaClient.chat.findMany()
+        let updatedShapes = await prismaClient.chat.findMany({
+          where: {
+            roomId: roomId
+          }
+        });
+
         console.log("updated Shapes from the ws-backend",updatedShapes)
         
 

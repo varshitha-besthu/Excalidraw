@@ -17,10 +17,12 @@ import {
   Send,
   ArrowUp
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const navigate = useRouter()
   const { scrollY } = useScroll();
   
   const heroY = useTransform(scrollY, [0, 500], [0, -100]);
@@ -81,7 +83,8 @@ export default function Home() {
               whileTap={{ y: 0, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Button variant={"outline"} size="sm" className="bg-amber-300 hover:bg-amber-400 text-black border-amber-400 transition-colors duration-200">
+              
+              <Button onClick = {() => {navigate.push("/signin")}} variant={"outline"} size="sm" className="bg-amber-300 hover:bg-amber-400 text-black border-amber-400 transition-colors duration-200">
                 Sign in
               </Button>
             </motion.div>
@@ -91,7 +94,7 @@ export default function Home() {
               whileTap={{ y: 0, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Button variant={"outline"} size="sm" className="bg-amber-300 hover:bg-amber-400 text-black border-amber-400 transition-colors duration-200">
+              <Button onClick = {() => {navigate.push("/signup")}} variant={"outline"} size="sm" className="bg-amber-300 hover:bg-amber-400 text-black border-amber-400 transition-colors duration-200">
                 Sign up
               </Button>
             </motion.div>
@@ -288,7 +291,6 @@ export default function Home() {
                   className="flex items-center space-x-4 p-4 rounded-lg bg-neutral-800/50 backdrop-blur-sm border border-amber-300/20 hover:border-amber-300/40 transition-all duration-300"
                 >
                   <motion.div
-                    whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
                     <contact.icon className="w-6 h-6 text-amber-300" />
