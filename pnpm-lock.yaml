@@ -99,6 +99,10 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+    devDependencies:
+      prisma:
+        specifier: ^6.8.2
+        version: 6.8.2(typescript@5.8.2)
 
   apps/web:
     dependencies:
