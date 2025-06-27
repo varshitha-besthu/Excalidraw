@@ -9,7 +9,9 @@ type Shape = {
     y : number;
     width : number;
     height: number;
-    roomId: number
+    roomId: number;
+    strokeColor: string
+
 } | {
     id ?:number,
     type: "circle";
@@ -17,12 +19,15 @@ type Shape = {
     centerY: number;
     radius: number;
     roomId: number
+    strokeColor: string
 
 } | {
     id ?:number,
     type: "pencil";
     pencilPath: {x: number, y: number, drag: boolean}[];
     roomId: number
+    strokeColor: string
+
 
 } | {
     id ?:number,
@@ -32,16 +37,22 @@ type Shape = {
     endX : number,
     endY : number
     roomId: number
+    strokeColor: string
+
 
 } | {
     id ?:number,
     type : "eraser"
     roomId: number
+    strokeColor: string
+
 
 } | {
     id?: "number",
     type : "panning"
     roomId: number
+    strokeColor: string
+
 
 }
 
@@ -90,8 +101,11 @@ export class Game{
         this.clearCanvas();
     }
     
-    setTool(tool : "circle" | "pencil" | "rect" | "arrow" | "eraser" | "panning" ){
+    setTool(tool : "circle" | "pencil" | "rect" | "arrow" | "eraser" | "panning"|"selection" ){
         this.selectedTool = tool;
+    }
+    setColor(color : "white" | "green" | "purple" | "red" | "yellow" | "blue" ){
+        this.selectedColor = color;
     }
     initHandlers(){
         this.socket.onmessage = (event) => {
@@ -148,18 +162,20 @@ export class Game{
                 //@ts-ignore
                 shape = s.shape
             }
-            this.ctx.strokeStyle = "rgba(255, 255, 255)";
             if (shape.type === "rect") {
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.beginPath()
                 this.ctx.roundRect(shape.x, shape.y, shape.width, shape.height, [5]);
                 this.ctx.stroke()
                 this.ctx.closePath()
             } else if(shape.type === "circle") {
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.beginPath();
                 this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
                 this.ctx.stroke();
                 this.ctx.closePath();                
             }else if (shape.type === "pencil") {
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.lineJoin = "round";
                 this.ctx.lineCap = "round";
                 this.ctx.beginPath();
@@ -175,6 +191,7 @@ export class Game{
                 this.ctx.stroke();
                 this.ctx.closePath();
             }else if(shape.type === "arrow"){
+                this.ctx.strokeStyle = shape.strokeColor;
                 let headlen = 10; 
                 let dx = shape.endX - shape.startX;
                 let dy = shape.endY - shape.startY;
@@ -230,7 +247,8 @@ export class Game{
                     y: this.startY,
                     height,
                     width,
-                    roomId: Number(this.roomId)
+                    roomId: Number(this.roomId),
+                    strokeColor:this.selectedColor
                 }
             } else if (this.selectedTool === "circle") {
                 const radius = Math.max(width, height) / 2;
@@ -241,7 +259,9 @@ export class Game{
                     radius: radius,
                     centerX: this.startX + width/2,
                     centerY: this.startY + height/2,
-                    roomId: Number(this.roomId)
+                    roomId: Number(this.roomId),
+                    strokeColor:this.selectedColor
+
                     
                 }
             }else if(this.selectedTool === "pencil"){
@@ -250,8 +270,8 @@ export class Game{
 
                     type:"pencil",
                     pencilPath: this.pencilPath,
-                    roomId: Number(this.roomId)
-
+                    roomId: Number(this.roomId),
+                    strokeColor:this.selectedColor
                 }
                 this.ctx.closePath();
                 this.pencilPath = [];
@@ -265,7 +285,8 @@ export class Game{
                     startY : this.startY,
                     endX : transformedX,
                     endY : transformedY,
-                    roomId: Number(this.roomId)
+                    roomId: Number(this.roomId),
+                    strokeColor:this.selectedColor
 
                 }
             }else if(this.selectedTool === "eraser"){
@@ -336,12 +357,15 @@ export class Game{
 
             this.ctx.beginPath();
             if (shape.type === "rect") {
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.roundRect(shape.x, shape.y, shape.width, shape.height, [5]);
             } else if (shape.type === "circle") {
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
             } else if (shape.type === "pencil") {
                 this.ctx.lineJoin = "round";
                 this.ctx.lineCap = "round";
+                this.ctx.strokeStyle = shape.strokeColor;
                 for (let i = 0; i < shape.pencilPath.length; i++) {
                     const point = shape.pencilPath[i];
                     if (point.drag && i > 0) {
@@ -356,6 +380,7 @@ export class Game{
                 const dy = shape.endY - shape.startY;
                 const angle = Math.atan2(dy, dx);
                 const headlen = 10;
+                this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.moveTo(shape.startX, shape.startY);
                 this.ctx.lineTo(shape.endX, shape.endY);
                 this.ctx.lineTo(
@@ -371,8 +396,9 @@ export class Game{
             this.ctx.stroke();
             this.ctx.closePath();
         });
-        this.ctx.strokeStyle = "rgba(255, 255, 255)";
+        // this.ctx.strokeStyle = "rgba(255, 255, 255)";
         if (this.selectedTool === "rect") {
+            this.ctx.strokeStyle = this.selectedColor;
             this.ctx.beginPath();
             this.ctx.roundRect(this.startX, this.startY, width, height, [5]);
             this.ctx.stroke();
@@ -381,13 +407,18 @@ export class Game{
             const radius = Math.max(Math.abs(width), Math.abs(height)) / 2;
             const centerX = this.startX + width / 2;
             const centerY = this.startY + height / 2;
+            this.ctx.strokeStyle = this.selectedColor;
+
             this.ctx.beginPath();
             this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             this.ctx.stroke();
             this.ctx.closePath();
         } else if (this.selectedTool === "pencil") {
             this.pencilPath.push({ x, y, drag: true });
+            this.ctx.strokeStyle = this.selectedColor;
+
             this.ctx.beginPath();
+
             this.ctx.lineCap = "round";
             for (let i = 0; i < this.pencilPath.length; i++) {
                 const point = this.pencilPath[i];
