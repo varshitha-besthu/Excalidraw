@@ -192,7 +192,7 @@ export class Game{
             return;
         }
        
-        this.startY = e.offsetY 
+        this.startY = transformedY 
         if(this.selectedTool === "pencil"){
             this.pencilPath = [{x: transformedX,y: transformedY, drag:false}];
             this.ctx.lineJoin = "round"
