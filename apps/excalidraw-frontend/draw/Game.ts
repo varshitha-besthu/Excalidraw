@@ -164,15 +164,9 @@ export class Game{
 
         this.ctx.strokeStyle = "rgba(255, 255, 255)"
         this.existingShapes.map((s) => {
-            //@ts-ignore
-            let shape;
-            //@ts-ignore
-            if(!s.shape){
-                shape = s
-            }else{
-                //@ts-ignore
-                shape = s.shape
-            }
+            
+            const shape = (s as any).shape ?? s;
+            
             if (shape.type === "rect") {
                 this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.beginPath()
@@ -362,8 +356,8 @@ export class Game{
 
         // // 👇 Redraw all existing shapes during preview
         this.existingShapes.forEach((s) => {
-            //@ts-ignore
-            const shape = s.shape ?? s;
+            const shape = (s as any).shape ?? s;
+
             if (!shape) return;
 
             this.ctx.beginPath();
@@ -372,7 +366,7 @@ export class Game{
                 this.ctx.roundRect(shape.x, shape.y, shape.width, shape.height, [5]);
             } else if (shape.type === "circle") {
                 this.ctx.strokeStyle = shape.strokeColor;
-                this.ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
+                this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
             } else if (shape.type === "pencil") {
                 this.ctx.lineJoin = "round";
                 this.ctx.lineCap = "round";
@@ -467,17 +461,8 @@ export class Game{
             // this.clearCanvas()
             console.log("Existing Shapes", this.existingShapes);
             this.existingShapes.forEach((s) => {
-                //@ts-ignore
-                let shape;
-                //@ts-ignore
-                if(!s.shape){
-                    shape = s
-                    // alert("here s is shape")
-                }else{
-                    //@ts-ignore
-                    // alert("here s is not shape")
-                    shape = s.shape
-                }
+                const shape = (s as any).shape ?? s;
+                
 
                 if (shape.type === "rect") {
                     const left = Math.min(shape.x, shape.x + shape.width);
@@ -490,9 +475,7 @@ export class Game{
                     if((inX && inY)){
                         console.log(s);
                         
-                        //@ts-ignore
-                        // this.deleteShape(s.id);
-                        this.deletedShapes.push(s.id)
+                        this.deletedShapes.push(Number(s.id))
                     }
                 }
 
@@ -502,9 +485,7 @@ export class Game{
                     if(!(dx * dx + dy * dy > shape.radius * shape.radius)){
                         console.log(s);
 
-                        //@ts-ignore
-                        // this.deleteShape(s.id);
-                        this.deletedShapes.push(s.id)
+                        this.deletedShapes.push(Number(s.id))
 
                     }
                     
@@ -520,9 +501,7 @@ export class Game{
                     });
                     if(isNearAnyPoint){
                         console.log(s);
-                        //@ts-ignore
-                        // this.deleteShape(s.id);
-                        this.deletedShapes.push(s.id)
+                        this.deletedShapes.push(Number(s.id))
 
                     }
                 }
@@ -537,9 +516,7 @@ export class Game{
                     if(isInside){
                         console.log(s);
 
-                        //@ts-ignore
-                        // this.deleteShape(s.id);
-                        this.deletedShapes.push(s.id)
+                        this.deletedShapes.push(Number(s.id))
 
                     }
                 }
@@ -555,8 +532,8 @@ export class Game{
             return
         }
         this.existingShapes = this.existingShapes.filter(
-            //@ts-ignore
-            s => !deletedShapes.includes(s.id!)
+            
+            s => !deletedShapes.includes(Number(s.id)!)
         );
 
         this.socket.send(JSON.stringify({
