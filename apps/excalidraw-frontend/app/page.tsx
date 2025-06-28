@@ -167,7 +167,7 @@ export default function Home() {
               className="rounded-2xl w-full max-w-4xl"
             >
               <source src="/images/canvas.mp4" />
-              Your browser doesn't support video playback
+              {"Your browser doesnt support video playback"}
             </video>
           </div>
         </motion.div>
