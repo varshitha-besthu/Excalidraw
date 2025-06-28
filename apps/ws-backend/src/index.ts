@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws";
+import { WebSocketServer,WebSocket } from "ws";
 import jwt from "jsonwebtoken";
 const { prismaClient } = require("@repo/db/client");
 const { JWT_SECRET } = require("@repo/be-common/src/index");
@@ -7,9 +7,9 @@ const wss = new WebSocketServer({ port });
 
 
 interface User {
-  ws: WebSocket;
   rooms: string[];
   userId: string;
+  ws: WebSocket;
 }
 
 const users: User[] = [];
@@ -46,7 +46,6 @@ wss.on("connection", function connection(ws, request) {
   users.push({
     userId,
     rooms: [],
-    // @ts-ignore
     ws,
   });
   ws.on("message", async function connection(data) {
@@ -58,13 +57,11 @@ wss.on("connection", function connection(ws, request) {
     }
 
     if (parsedData.type === "join_room") {
-        //@ts-ignore
       const user = users.find((x) => x.ws === ws);
       user?.rooms.push(parsedData.roomId);
     }
 
     if (parsedData.type === "leave_room") {
-    //@ts-ignore
       const user = users.find((x) => x.ws === ws);
       if (!user) {
         return;
@@ -105,7 +102,6 @@ wss.on("connection", function connection(ws, request) {
       });
     }
     if(parsedData.type === "delete"){
-      //@ts-ignore
       const roomId = parsedData.roomId;
       try {
         const delItem = JSON.parse(parsedData.message).deletedShapes;

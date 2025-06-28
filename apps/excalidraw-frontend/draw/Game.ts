@@ -493,8 +493,8 @@ export class Game{
 
                 else if (shape.type === "pencil") {
                     const eraserRadius = 5;
-                    //@ts-ignore
-                    const isNearAnyPoint = shape.pencilPath.some((point) => {
+                    
+                    const isNearAnyPoint = shape.pencilPath.some((point:{x:number, y:number, drag:boolean}) => {
                         const dx = x - point.x;
                         const dy = y - point.y;
                         return dx * dx + dy * dy <= eraserRadius * eraserRadius;

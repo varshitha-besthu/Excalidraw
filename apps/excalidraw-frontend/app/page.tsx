@@ -32,13 +32,11 @@ export default function Home() {
     setShowScrollTop(window.scrollY > 400);
   };
 
-  //@ts-ignore
-  const handleInputChange = (e) => {
+  const handleInputChange = ( e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  //@ts-ignore
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
     setFormData({ name: "", email: "", message: "" });
