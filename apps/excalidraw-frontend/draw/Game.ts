@@ -86,10 +86,21 @@ export class Game{
         this.roomId = roomId
         this.socket = socket
         this.clicked = false;
+        this.resize()
         this.init();
         this.initHandlers();
         this.initMouseHandlers();
     }
+    resize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        this.canvas.width = width;
+        this.canvas.height = height;
+
+        this.clearCanvas(); 
+    }
+
     async init(){
         this.existingShapes = await getExistingShapes(this.roomId);
         console.log(this.existingShapes);
