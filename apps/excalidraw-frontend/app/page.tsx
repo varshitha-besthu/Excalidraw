@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, useScroll, useTransform } from "motion/react";
 import { 
-  Axis3D, 
   Move3D, 
   MoveRight, 
-  Paintbrush2, 
   Pencil, 
   Scale, 
   Square,
@@ -260,10 +258,10 @@ export default function Home() {
             className="text-center mb-12"
           >
             <p className="text-3xl md:text-5xl text-amber-100 font-bold mb-4">
-              Let's Create Together
+              {"Let's Create Together"}
             </p>
             <p className="font-mono text-pink-200 text-lg md:text-xl">
-              Ready to start sketching? Get in touch with us today.
+              {"Ready to start sketching? Get in touch with us today."}
             </p>
           </motion.div>
 

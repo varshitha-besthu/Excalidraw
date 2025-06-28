@@ -55,6 +55,9 @@ type Shape = {
 
 
 }
+interface ShapeWrapper {
+        shape: Shape;
+}
 
 export class Game{
     private canvas: HTMLCanvasElement
@@ -145,6 +148,12 @@ export class Game{
         this.canvas.removeEventListener("mousemove", this.MouseMoveHandler)
         
     }
+    
+
+    hasShape(obj: unknown): obj is ShapeWrapper {
+        return typeof obj === 'object' && obj !== null && 'shape' in obj;
+    }
+
     clearCanvas(){
         if(!this.ctx){
             return;
@@ -165,8 +174,8 @@ export class Game{
         this.ctx.strokeStyle = "rgba(255, 255, 255)"
         this.existingShapes.map((s) => {
             
-            const shape = (s as any).shape ?? s;
-            
+            // const shape = (s as any).shape ?? s;
+            const shape = this.hasShape(s) ? s.shape : s;
             if (shape.type === "rect") {
                 this.ctx.strokeStyle = shape.strokeColor;
                 this.ctx.beginPath()
@@ -356,7 +365,8 @@ export class Game{
 
         // // 👇 Redraw all existing shapes during preview
         this.existingShapes.forEach((s) => {
-            const shape = (s as any).shape ?? s;
+            const shape = this.hasShape(s) ? s.shape : s;
+
 
             if (!shape) return;
 
@@ -461,8 +471,8 @@ export class Game{
             // this.clearCanvas()
             console.log("Existing Shapes", this.existingShapes);
             this.existingShapes.forEach((s) => {
-                const shape = (s as any).shape ?? s;
-                
+                // const shape = (s as any).shape ?? s;
+                const shape = this.hasShape(s) ? s.shape : s;
 
                 if (shape.type === "rect") {
                     const left = Math.min(shape.x, shape.x + shape.width);
