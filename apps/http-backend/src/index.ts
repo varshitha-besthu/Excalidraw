@@ -79,7 +79,6 @@ app.post("/room", middleware, async (req, res) => {
         })
         return;
     }
-    // @ts-ignore
     const userId = req.userId;
     console.log(userId);
     try{
