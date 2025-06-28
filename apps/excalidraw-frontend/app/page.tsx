@@ -112,7 +112,7 @@ export default function Home() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            Sketch Out Loud!
+            {"Sketch Out Loud!"}
           </motion.p>
           
           <motion.p 
@@ -121,7 +121,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Intuitive drawing. Real-time collaboration. Zero distractions.
+            {"Intuitive drawing. Real-time collaboration. Zero distractions."}
           </motion.p>
           
           <motion.div 
@@ -195,7 +195,7 @@ export default function Home() {
             Everything you need to create
           </p>
           <p className="font-mono text-pink-100 text-lg md:text-xl max-w-2xl mx-auto">
-            Powerful tools designed for simplicity, creativity, and collaboration
+            {"Powerful tools designed for simplicity, creativity, and collaboration"}
           </p>
         </motion.div>
         
