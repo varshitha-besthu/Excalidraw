@@ -39,11 +39,11 @@ export default function CreateRoom(){
         <div>
             <Input type="text" placeholder="room name" onChange={(e) => setSlug(e.target.value)}/>
             <div className="flex gap-2">
-                <Button onClick={(e) => {
+                <Button onClick={() => {
                     setisJoin("join")
                     handleOnClick()
                 }}>Join Room</Button>
-                <Button onClick={(e) => {
+                <Button onClick={() => {
                     setisJoin("create")
                     handleOnClick()
                 }}>Create Room</Button>

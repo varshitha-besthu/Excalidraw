@@ -20,7 +20,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
 
     const endpoint = isSignin ? "signin" : "signup";
 
-    try {
+    
       let res;
       if(isSignin){
         res = await axios.post(`${HTTP_BACKEND}/${endpoint}`, {
@@ -43,10 +43,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
       } else {
         router.push("/signin");
       }
-    } catch (err: any) {
-      console.error("Authentication failed:", err?.response?.data || err.message);
-      alert(err?.response?.data?.message || "Something went wrong");
-    }
+    
   }
 
   return (
